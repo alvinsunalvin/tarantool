@@ -1812,6 +1812,10 @@ sequence_mt.next = function(self)
     return internal.sequence.next(self.id)
 end
 
+sequence_mt.current = function(self)
+    return internal.sequence.current(self.id)
+end
+
 sequence_mt.set = function(self, value)
     return internal.sequence.set(self.id, value)
 end
