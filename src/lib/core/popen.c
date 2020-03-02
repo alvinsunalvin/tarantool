@@ -833,9 +833,11 @@ popen_new(struct popen_opts *opts)
 		if (opts->flags & POPEN_FLAG_RESTORE_SIGNALS)
 			signal_reset();
 
+#ifndef TARGET_OS_DARWIN
 		/*
-		 * We have to be a session leader otherwise
-		 * won't be able to kill a group of children.
+		 * Note that on MacOS we're not allowed to
+		 * set sid after vfork (it is OS specific)
+		 * thus simply ignore this flag.
 		 */
 		if (opts->flags & POPEN_FLAG_SETSID) {
 			if (setsid() == -1) {
@@ -843,6 +845,7 @@ popen_new(struct popen_opts *opts)
 				goto exit_child;
 			}
 		}
+#endif
 
 		if (opts->flags & POPEN_FLAG_CLOSE_FDS) {
 			if (close_inherited_fds(skip_fds, nr_skip_fds)) {
