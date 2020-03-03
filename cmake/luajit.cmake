@@ -225,6 +225,35 @@ macro(luajit_build)
         set(luajit_xcflags ${luajit_xcflags} -D${def})
     endforeach()
 
+    message("!!!!LTO bsiness")
+    message("${luajit_cflags} luajit cflags")
+    message("${luajit_ldlags} luajit lsdflags")
+    if (CMAKE_INTERPROCEDURAL_OPTIMIZATION)
+	message("LTO support is on")
+	# Add clang options for LTO support
+	if (CMAKE_COMPILER_IS_CLANG AND
+	    NOT ${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS 3.4)
+		message("${CMAKE_CXX_COMPILER_VERSION} version")
+		message("${linker_version} LINKER VERSION")
+		if (${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS 3.9)
+			message("LTO -flto=-full")
+			set(luajit_cflags ${luajit_cflags} -flto=full)
+		else()
+			message("ThinLTO supported")
+			set(luajit_cflags ${luajit_cflags} -flto)
+		endif()
+	# Add LTO support flag to gcc
+	else()
+		#Due to some problems (bugs, slow work, etc) we support
+		#LTO only for 5.0+
+		#The same is for binutils prior 2.27
+		if (NOT ${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS 5.0
+		    AND NOT ${linker_version} VERSION_LESS 2.27)
+			message("Fat LTO objects supported on 5.0+ and 2.27 linker")
+			set(luajit_cflags ${luajit_cflags} -flto -fuse-linker-plugin -fno-fat-lto-objects)
+		endif()
+	endif()
+   endif()
     # Pass the same toolchain that is used for building of
     # tarantool itself, because tools from different toolchains
     # can be incompatible. A compiler and a linker are already set
