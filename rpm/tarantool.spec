@@ -161,10 +161,6 @@ make %{?_smp_mflags}
 rm -rf %{buildroot}%{_datarootdir}/doc/tarantool/
 
 %check
-# https://github.com/tarantool/tarantool/issues/1227
-echo "self.skip = True" > ./test/app/socket.skipcond
-# https://github.com/tarantool/tarantool/issues/1322
-echo "self.skip = True" > ./test/app/digest.skipcond
 # Run all available test suites except 'replication'
 # which is not currently ready for this testing and
 # has standalone issue for it's enabling:
